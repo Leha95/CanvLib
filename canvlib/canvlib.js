@@ -158,6 +158,35 @@ class CanvLibCircle extends CanvLibObject{
 }
 
 
+class CanvLibText extends CanvLibObject{
+
+    constructor(params){
+        super(...(params.children||[]));
+
+        this.unpack(params,'x', 'y', 'width', 'height', 'text','font', 'fill_color', 'border_color', 'border_width' , ['onclick','click']);
+    }
+
+    pointInside(event){
+        let {x,y,width,height} = this;
+        y=y-20;
+        let {offsetX,offsetY} = event;
+        return (x<=offsetX&&offsetX<=x+width) && (y<=offsetY&&offsetY<=y+height);
+    }
+
+    render(context={},parent={x:0,y:0}){
+        context.fillStyle = this.fill_color||'transparent';
+        context.strokeStyle = this.border_color||'transparent';
+        context.lineWidth = this.border_width||0;
+        context.font = this.font;
+
+        context.fillText(this.text,this.x+parent.x,this.y+parent.y);
+        context.strokeText(this.text,this.x+parent.x,this.y+parent.y);
+        this.renderChildren(context);
+    }
+
+}
+
+
 class CanvLibCanvas{
 
     constructor(selector, params={}){
