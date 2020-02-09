@@ -88,8 +88,67 @@ class CanvLibRectangle extends CanvLibObject{
         context.strokeStyle = this.border_color||'transparent';
         context.lineWidth = this.border_width||0;
         context.beginPath();
-
         context.rect(this.x+parent.x,this.y+parent.y,this.width,this.height);
+        context.fill();
+        context.stroke();
+        this.renderChildren(context);
+    }
+
+}
+
+
+class CanvLibPolygon extends CanvLibObject{
+
+    constructor(params){
+        super(...(params.children||[]));
+
+        this.unpack(params,'x', 'y', 'points', 'background_color', 'border_color', 'border_width',['onclick','click']);
+    }
+
+    pointInside(event){
+        return false;
+    }
+
+    render(context={},parent={x:0,y:0}){
+        context.fillStyle = this.background_color||'transparent';
+        context.strokeStyle = this.border_color||'transparent';
+        context.lineWidth = this.border_width||0;
+        context.beginPath();
+        let x = this.x+parent.x;
+        let y = this.y+parent.y;
+        context.moveTo(x,y);
+        this.points.forEach((point)=>{
+            context.lineTo(point[0]+x,point[1]+y);
+        });
+
+        context.fill();
+        context.stroke();
+        this.renderChildren(context);
+    }
+
+}
+
+class CanvLibCircle extends CanvLibObject{
+
+    constructor(params){
+        super(...(params.children||[]));
+
+        this.unpack(params,'x', 'y', 'radius', 'background_color', 'border_color', 'border_width',['onclick','click']);
+    }
+
+    pointInside(event){
+        let {x,y,radius} = this;
+        let {offsetX,offsetY} = event;
+        return ((offsetX - x)**2 + (offsetY - y)**2) <= radius**2;
+    }
+
+    render(context={},parent={x:0,y:0}){
+        context.fillStyle = this.background_color||'transparent';
+        context.strokeStyle = this.border_color||'transparent';
+        context.lineWidth = this.border_width||0;
+        context.beginPath();
+
+        context.arc(this.x+parent.x, this.y+parent.y, this.radius, 0, 2 * Math.PI);
 
         context.fill();
         context.stroke();
@@ -122,9 +181,14 @@ class CanvLibCanvas{
     }
 
     _render(){
-        this._context.clearRect(0,0,this._canvas.width,this._canvas.height)
+        this._context.fillStyle = this._background_color||'white';
+        this._context.fillRect(0,0,this._canvas.width,this._canvas.height);
         this.root.renderChildren(this._context);
         requestAnimationFrame(()=>this._render());
+    }
+
+    set background_color(background_color){
+        this._background_color = background_color||this._background_color;
     }
 
 }
