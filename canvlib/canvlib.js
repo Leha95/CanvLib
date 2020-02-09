@@ -1,3 +1,17 @@
+class Font{
+
+    constructor(size,family){
+        this.size = size;
+        this.family = family;
+    }
+
+    toString(){
+        return `${this.size}px ${this.family}`;
+    }
+
+}
+
+
 
 class CanvLibObject{
 
@@ -5,6 +19,8 @@ class CanvLibObject{
         this.children = objects;
         this.x = 0;
         this.y = 0;
+        this.center_x = 0;
+        this.center_y = 0;
 
     }
 
@@ -163,7 +179,9 @@ class CanvLibText extends CanvLibObject{
     constructor(params){
         super(...(params.children||[]));
 
-        this.unpack(params,'x', 'y', 'width', 'height', 'text','font', 'fill_color', 'border_color', 'border_width' , ['onclick','click']);
+        this.unpack(params,'x', 'y', 'width', 'height', 'text','font', 'fill_color', 'border_color', 'border_width', 'center_x', 'center_y' , ['onclick','click']);
+        !this.center_y?this.center_y=0:0;
+        !this.center_x?this.center_x=0:0;
     }
 
     pointInside(event){
@@ -177,10 +195,10 @@ class CanvLibText extends CanvLibObject{
         context.fillStyle = this.fill_color||'transparent';
         context.strokeStyle = this.border_color||'transparent';
         context.lineWidth = this.border_width||0;
-        context.font = this.font;
+        context.font = this.font.toString();
 
-        context.fillText(this.text,this.x+parent.x,this.y+parent.y);
-        context.strokeText(this.text,this.x+parent.x,this.y+parent.y);
+        context.fillText(this.text,this.x+parent.x+this.center_x, this.y+parent.y+this.font.size+this.center_y);
+        context.strokeText(this.text,this.x+parent.x+this.center_x, this.y+parent.y+this.font.size+this.center_y);
         this.renderChildren(context);
     }
 
